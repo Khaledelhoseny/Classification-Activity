@@ -1,4 +1,4 @@
-# Classification-Activity .
+# Classification-Activity 
 This activity helps the student practice classifying words according to their part of speech
 ## Installation : 
 1. clone the repo .
