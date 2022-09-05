@@ -39,13 +39,13 @@
     height: 30px;  
     margin-bottom: 20px;
 }
-.bar_container{
+.ProgressBar{
     width: 345px;
     height: 20px;
     border: 2px solid black;
     margin: 20px auto;
 }
-.bar{
+.progress{
     width: 0px ;
     height: 20px;
     background-color: blue;
@@ -70,7 +70,7 @@ button{
     cursor: pointer;
 }
 
-.score_container{
+.ScoreBar{
 
         margin: auto;
         background-color: gray;

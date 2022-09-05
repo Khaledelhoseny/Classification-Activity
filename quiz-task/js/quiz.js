@@ -82,66 +82,57 @@ const jsonFile = ` {
 
 ///------------ Globals------------------------
 
-
+const projectObject = JSON.parse(jsonFile)
 const wordText = document.querySelector("#word")
 const choices_buttons = document.querySelectorAll("button")
-const score_bar = document.querySelector(".bar")
-let count_success = 0;
-let count_clicked = 0;
+const progressBar = document.querySelector(".progress")
+let successCount = 0;
+let clickedCount = 0;
 
 ///------------------------------------------
 
 
 
 
-let myObject = JSON.parse(jsonFile)
-const wordsArray = []
-function generateArray() {
-    for (let x of myObject.wordList) {
-        wordsArray.push(x.word)
-    }
-}
 
-generateArray()
-
-function get_random_index(elemnt) {
+function getRandomIndex(elemnt) {
     return Math.floor(Math.random() * elemnt.length)
 }
 
-function get_random(list_of_elements) {
-    index = get_random_index(list_of_elements);
-    // return list_of_elements[index][0].toUpperCase() + list_of_elements[index].substring(1);
-    return list_of_elements[index]
+function getRandom(listOfElemnts) {
+    index = getRandomIndex(listOfElemnts);
+    // return listOfElemnts[index][0].toUpperCase() + listOfElemnts[index].substring(1);
+    return listOfElemnts[index]
+}
+
+
+function changeRandom() {
+    const randomObject = getRandom(projectObject.wordList)
+    wordText.innerText = randomObject.word
+}
+
+changeRandom()
+
+function updateWordsArray() {
+    projectObject.wordList.splice(index, 1)
 }
 
 
 
-
-
-function increment_scoreBar() {
-    if (count_clicked < 16) {
-        const score_bar_width = score_bar.offsetWidth + 23
-        score_bar.style.width = `${score_bar_width}px`
+function incrementProgressBar() {
+    if (clickedCount < 16) {
+        const progressBarWidth = progressBar.offsetWidth + 23
+        progressBar.style.width = `${progressBarWidth}px`
     }
 
 }
 
 
-function change_random() {
-    wordText.innerText = get_random(wordsArray)
-}
-
-change_random()
-
-
-function updateWordsArray() {
-    wordsArray.splice(wordsArray.indexOf(wordText.innerText), 1)
-    myObject.wordList.splice(index, 1)
-}
 
 
 
-function succes_action(button) {
+
+function applyBackgroundGreen(button) {
     button.classList.add("succes")
     for (let button of choices_buttons) {
         button.disabled = true;
@@ -155,23 +146,18 @@ function succes_action(button) {
         button.classList.remove("succes")
 
     }, 1000)
-    console.log(count_success += 1)
-    count_clicked += 1
+    console.log(successCount += 1)
+    clickedCount += 1
 }
 
 
 
-
-function wrong_action(button) {
-    console.log(myObject.wordList[index].pos)
-
-    const rightAns = document.querySelector(`#${myObject.wordList[index].pos}`)
+function applyBackgroundRed(button) {
+    const rightAns = document.querySelector(`#${projectObject.wordList[index].pos}`)
     rightAns.classList.add("succes")
     setTimeout(function () {
         rightAns.classList.remove("succes")
     }, 1000)
-
-
     button.classList.add("wrong")
     for (let button of choices_buttons) {
         button.disabled = true;
@@ -186,7 +172,7 @@ function wrong_action(button) {
     setTimeout(function () {
         button.classList.remove("wrong")
     }, 1000)
-    count_clicked += 1
+    clickedCount += 1
 }
 
 
@@ -196,23 +182,22 @@ function wrong_action(button) {
 
 
 
-choices_buttons.forEach(function (button) {
-    button.addEventListener("click", check_answer)
+choices_buttons.forEach(function (choiceButton) {
+    choiceButton.addEventListener("click", check_answer)
 
     function check_answer() {
-        if (button.innerText === myObject.wordList[index].pos) {
-            succes_action(button)
-        } else if (button.innerText !== myObject.wordList[index].pos) {
-            wrong_action(button)
+        if (choiceButton.innerText === projectObject.wordList[index].pos) {
+            applyBackgroundGreen(choiceButton)
+        } else if (choiceButton.innerText !== projectObject.wordList[index].pos) {
+            applyBackgroundRed(choiceButton)
         }
 
 
-        increment_scoreBar()
-        setTimeout(change_random, 1000)
+        incrementProgressBar()
+        setTimeout(changeRandom, 1000)
         updateWordsArray()
-        showProgress()
+        showScoreBar()
         showResult()
-
 
     }
 
@@ -220,44 +205,40 @@ choices_buttons.forEach(function (button) {
 })
 
 
-const scoreResult = document.querySelector(".score_container p")
-function showProgress() {
-    scoreResult.innerText = `${count_success} of 15 `
+const scoreBar = document.querySelector(".ScoreBar p")
+function showScoreBar() {
+    scoreBar.innerText = `${successCount} of 15 `
 }
 
 
 
 function showResult() {
-    if (count_clicked == 15) {
+    if (clickedCount == 15) {
 
         document.querySelector("#big_container").style.display = "none"
-        const result_container = document.createElement("div")
-        result_container.classList.add("result")
+        const resultContainer = document.createElement("div")
+        resultContainer.classList.add("result")
 
-        const result_text = document.createElement("h1")
-        result_text.innerText = `your score is ${Math.floor((count_success / 15) * 100)}% `
-        result_container.appendChild(result_text)
-        const try_again_btn = document.createElement("button")
-        result_container.appendChild(try_again_btn)
+        const resultText = document.createElement("h1")
+        resultText.innerText = `your score is ${Math.floor((successCount / 15) * 100)}% `
+        resultContainer.appendChild(resultText)
+        const tryAgainBtn = document.createElement("button")
+        resultContainer.appendChild(tryAgainBtn)
 
-        try_again_btn.innerText = "try again"
-        document.body.appendChild(result_container);
+        tryAgainBtn.innerText = "try again"
+        document.body.appendChild(resultContainer);
 
         document.querySelector(".result button").addEventListener("click", reset_quiz)
         function reset_quiz() {
             console.log("try again button ")
-            result_container.remove()
+            resultContainer.remove()
             document.querySelector("#big_container").style.display = "block"
-            score_bar.style.width = `0px`
-            count_clicked = 0
-            count_success = 0
-            scoreResult.innerText = "0 of 15"
-
-
+            progressBar.style.width = `0px`
+            clickedCount = 0
+            successCount = 0
+            scoreBar.innerText = "0 of 15"
 
         }
-
-
 
     }
 
