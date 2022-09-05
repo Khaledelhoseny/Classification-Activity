@@ -86,6 +86,7 @@ const projectObject = JSON.parse(jsonFile)
 const wordText = document.querySelector("#word")
 const choices_buttons = document.querySelectorAll("button")
 const progressBar = document.querySelector(".progress")
+const scoreBar = document.querySelector(".ScoreBar p")
 let successCount = 0;
 let clickedCount = 0;
 
@@ -183,9 +184,9 @@ function applyBackgroundRed(button) {
 
 
 choices_buttons.forEach(function (choiceButton) {
-    choiceButton.addEventListener("click", check_answer)
+    choiceButton.addEventListener("click", checkAnswer)
 
-    function check_answer() {
+    function checkAnswer() {
         if (choiceButton.innerText === projectObject.wordList[index].pos) {
             applyBackgroundGreen(choiceButton)
         } else if (choiceButton.innerText !== projectObject.wordList[index].pos) {
@@ -205,7 +206,6 @@ choices_buttons.forEach(function (choiceButton) {
 })
 
 
-const scoreBar = document.querySelector(".ScoreBar p")
 function showScoreBar() {
     scoreBar.innerText = `${successCount} of 15 `
 }
