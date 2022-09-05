@@ -98,11 +98,9 @@ generateArray()
 
 
 
-function get_random_index(ele) {
-
-    return Math.floor(Math.random()*ele.length)
+function get_random_index(elemnt) {
+    return Math.floor(Math.random()*elemnt.length)
   }
-
 
   function get_random(list_of_elements){
     index = get_random_index(list_of_elements);
@@ -120,19 +118,19 @@ let verbText = document.querySelector("#verb")
 
 let adverbText = document.querySelector("#adverb")
 
-let buttons = document.querySelectorAll("button")
+let all_buttons = document.querySelectorAll("button")
 
 let adjectiveText = document.querySelector("#adjective")
 
-let bar_score = document.querySelector(".bar")
+let score_bar = document.querySelector(".bar")
 
 
  
 
 function increment_scoreBar(){
         if(count_clicked < 16 ){ 
-            let x = bar_score.offsetWidth+23
-            bar_score.style.width = `${x}px`
+            let score_bar_width = score_bar.offsetWidth+23
+            score_bar.style.width = `${score_bar_width}px`
         }
             
 }
@@ -160,30 +158,26 @@ function updateWordsArray(){
 let count_success = 0 ; 
 let count_clicked = 0 ;
 
-buttons.forEach(function (button){
-   
-    button.addEventListener("click" , checkFunc)
-    
-    
-    function checkFunc(){
-    
+all_buttons.forEach(function (button){
+    button.addEventListener("click" , check_answer)
+    function check_answer(){
     if(button.innerText === myObject.wordList[index].pos){
         button.classList.add("succes")
 
-        for (let button of buttons) {
+        for (let button of all_buttons) {
             button.disabled = true;
           }
 
           setTimeout(() => {
-            for (let button of buttons) {
+            for (let button of all_buttons) {
                 button.disabled = false;
               }
-          }, 2000);
+          }, 1000);
        
         setTimeout(function(){
             button.classList.remove("succes")
 
-        },2000)
+        },1000)
 
         console.log(count_success+=1) 
         count_clicked+=1
@@ -195,31 +189,31 @@ buttons.forEach(function (button){
         rightAns.classList.add("succes")
         setTimeout(function(){
             rightAns.classList.remove("succes")
-        },2000)
+        },1000)
 
 
 
         button.classList.add("wrong")
-        for (let button of buttons) {
+        for (let button of all_buttons) {
             button.disabled = true;
           }
 
           setTimeout(() => {
-            for (let button of buttons) {
+            for (let button of all_buttons) {
                 button.disabled = false;
               }
-          }, 2000);
+          }, 1000);
 
         setTimeout(function(){
             button.classList.remove("wrong")
-        },2000)
+        },1000)
         count_clicked+=1
         
     }
 
     
     increment_scoreBar()
-    setTimeout(change_random,2000)
+    setTimeout(change_random,1000)
     updateWordsArray()
     showProgress()
     showResult()
@@ -244,25 +238,24 @@ function showResult(){
         if(count_clicked==15){
 
             document.querySelector("#big_container").style.display="none"
-            let div =  document.createElement("div")
-            div.classList.add("result")
+            let result_container =  document.createElement("div")
+            result_container.classList.add("result")
             
-            let parg = document.createElement("h1")
-            parg.innerText = `your score is ${ Math.floor((count_success/15)*100)}% `
-            div.appendChild(parg)
-            let button = document.createElement("button")
-            div.appendChild(button)
+            let result_text = document.createElement("h1")
+            result_text.innerText = `your score is ${ Math.floor((count_success/15)*100)}% `
+            result_container.appendChild(result_text)
+            let try_again_btn = document.createElement("button")
+            result_container.appendChild(try_again_btn)
             
-            button.innerText = "try again"
-            document.body.appendChild(div);
+            try_again_btn.innerText = "try again"
+            document.body.appendChild(result_container);
 
-            document.querySelector(".result button").addEventListener("click", reset )
-            function reset() {
-
+            document.querySelector(".result button").addEventListener("click", reset_quiz )
+            function reset_quiz() {
                 console.log("try again button ") 
-                div.remove()
+                result_container.remove()
                 document.querySelector("#big_container").style.display="block"
-                bar_score.style.width = `0px`
+                score_bar.style.width = `0px`
                 count_clicked = 0 
                 count_success = 0
                 scoreResult.innerText = "0 of 15"
