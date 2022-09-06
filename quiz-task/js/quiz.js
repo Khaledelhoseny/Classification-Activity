@@ -87,8 +87,7 @@ const wordText = document.querySelector("#word")
 const choicesButtons = document.querySelectorAll("button")
 const progressBar = document.querySelector(".progress")
 const scoreBar = document.querySelector(".ScoreBar p")
-let successCount = 0;
-let clickedCount = 0;
+
 const wordsNumber = 15
 
 ///------------------------------------------
@@ -112,18 +111,10 @@ function changeRandom() {
 
 changeRandom()
 
-
-// function updateWordsArray() {
-//     projectObject.wordList.splice(index, 1)
-// }
-
-
 function incrementProgressBar() {
-    if (clickedCount <= wordsNumber) {
         const progressBarWidth = progressBar.offsetWidth + 23
         progressBar.style.width = `${progressBarWidth}px`
-    }
-
+        
 }
 
 
@@ -142,8 +133,7 @@ function applyBackgroundGreen(button) {
     setTimeout(function () {
         button.classList.remove("succes")
     }, 1000)
-    successCount += 1
-    clickedCount += 1
+   
 }
 
 
@@ -168,7 +158,7 @@ function applyBackgroundRed(button) {
     setTimeout(function () {
         button.classList.remove("wrong")
     }, 1000)
-    clickedCount += 1
+    
 }
 
 
@@ -179,16 +169,17 @@ choicesButtons.forEach(function (choiceButton) {
     function checkAnswer() {
         if (choiceButton.innerText === projectObject.wordList[index].pos) {
             applyBackgroundGreen(choiceButton)
+            projectObject.wordList[index].score = true
+            // filterScores()
+            incrementSoreBar()
         } else if (choiceButton.innerText !== projectObject.wordList[index].pos) {
             applyBackgroundRed(choiceButton)
         }
 
-
-        
         setTimeout(changeRandom, 1000)
         incrementProgressBar()
-        showScoreBar()
         setTimeout(showResult, 1000)
+      
 
     }
 
@@ -196,22 +187,33 @@ choicesButtons.forEach(function (choiceButton) {
 })
 
 
-function showScoreBar() {
-    scoreBar.innerText = `${successCount} of ${wordsNumber} `
+
+
+      
+  
+let scoresArr =[]
+function incrementSoreBar(){
+        scoresArr = projectObject.wordList.filter(obj => {
+        return obj.score === true;
+      })
+      
+
+    scoreBar.innerText = `${scoresArr.length} of ${wordsNumber}`
+    console.log(scoresArr)
 }
 
 
 
 function showResult() {
-    const finalResult = Math.floor((successCount / 15) * 100)
+    if ( progressBar.style.width===`${345}px`) {
 
-    if (clickedCount == wordsNumber) {
+        const finalResult = Math.floor((scoresArr.length / 15) * 100)
         document.querySelector("#big_container").style.display = "none"
         const resultContainer = document.createElement("div")
         resultContainer.classList.add("result")
 
         const resultText = document.createElement("h1")
-        resultText.innerText = `your score is ${finalResult}% `
+        resultText.innerText = `your score is ${finalResult} % `
         
         resultContainer.appendChild(resultText)
         const tryAgainBtn = document.createElement("button")
@@ -229,10 +231,7 @@ function showResult() {
             resultContainer.remove()
             document.querySelector("#big_container").style.display = "block"
             progressBar.style.width = `0px`
-            clickedCount = 0
-            successCount = 0
-            scoreBar.innerText = "0 of 15"
-
+            
         }
 
     }
