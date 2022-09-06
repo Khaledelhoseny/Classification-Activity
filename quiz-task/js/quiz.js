@@ -84,11 +84,12 @@ const jsonFile = ` {
 
 const projectObject = JSON.parse(jsonFile)
 const wordText = document.querySelector("#word")
-const choices_buttons = document.querySelectorAll("button")
+const choicesButtons = document.querySelectorAll("button")
 const progressBar = document.querySelector(".progress")
 const scoreBar = document.querySelector(".ScoreBar p")
 let successCount = 0;
 let clickedCount = 0;
+const wordsNumber = 15
 
 ///------------------------------------------
 
@@ -96,14 +97,11 @@ let clickedCount = 0;
 
 
 
-function getRandomIndex(elemnt) {
-    return Math.floor(Math.random() * elemnt.length)
-}
 
-function getRandom(listOfElemnts) {
-    index = getRandomIndex(listOfElemnts);
-    // return listOfElemnts[index][0].toUpperCase() + listOfElemnts[index].substring(1);
-    return listOfElemnts[index]
+
+function getRandom(arr) {
+    index = Math.floor(Math.random() * arr.length)
+    return arr[index]
 }
 
 
@@ -114,14 +112,14 @@ function changeRandom() {
 
 changeRandom()
 
-function updateWordsArray() {
-    projectObject.wordList.splice(index, 1)
-}
 
+// function updateWordsArray() {
+//     projectObject.wordList.splice(index, 1)
+// }
 
 
 function incrementProgressBar() {
-    if (clickedCount < 16) {
+    if (clickedCount <= wordsNumber) {
         const progressBarWidth = progressBar.offsetWidth + 23
         progressBar.style.width = `${progressBarWidth}px`
     }
@@ -131,23 +129,20 @@ function incrementProgressBar() {
 
 
 
-
-
 function applyBackgroundGreen(button) {
     button.classList.add("succes")
-    for (let button of choices_buttons) {
+    for (let button of choicesButtons) {
         button.disabled = true;
     }
     setTimeout(() => {
-        for (let button of choices_buttons) {
+        for (let button of choicesButtons) {
             button.disabled = false;
         }
     }, 1000);
     setTimeout(function () {
         button.classList.remove("succes")
-
     }, 1000)
-    console.log(successCount += 1)
+    successCount += 1
     clickedCount += 1
 }
 
@@ -160,12 +155,12 @@ function applyBackgroundRed(button) {
         rightAns.classList.remove("succes")
     }, 1000)
     button.classList.add("wrong")
-    for (let button of choices_buttons) {
+    for (let button of choicesButtons) {
         button.disabled = true;
     }
 
     setTimeout(() => {
-        for (let button of choices_buttons) {
+        for (let button of choicesButtons) {
             button.disabled = false;
         }
     }, 1000);
@@ -178,12 +173,7 @@ function applyBackgroundRed(button) {
 
 
 
-
-
-
-
-
-choices_buttons.forEach(function (choiceButton) {
+choicesButtons.forEach(function (choiceButton) {
     choiceButton.addEventListener("click", checkAnswer)
 
     function checkAnswer() {
@@ -194,11 +184,11 @@ choices_buttons.forEach(function (choiceButton) {
         }
 
 
-        incrementProgressBar()
+        
         setTimeout(changeRandom, 1000)
-        updateWordsArray()
+        incrementProgressBar()
         showScoreBar()
-        showResult()
+        setTimeout(showResult, 1000)
 
     }
 
@@ -207,26 +197,31 @@ choices_buttons.forEach(function (choiceButton) {
 
 
 function showScoreBar() {
-    scoreBar.innerText = `${successCount} of 15 `
+    scoreBar.innerText = `${successCount} of ${wordsNumber} `
 }
 
 
 
 function showResult() {
-    if (clickedCount == 15) {
+    const finalResult = Math.floor((successCount / 15) * 100)
 
+    if (clickedCount == wordsNumber) {
         document.querySelector("#big_container").style.display = "none"
         const resultContainer = document.createElement("div")
         resultContainer.classList.add("result")
 
         const resultText = document.createElement("h1")
-        resultText.innerText = `your score is ${Math.floor((successCount / 15) * 100)}% `
+        resultText.innerText = `your score is ${finalResult}% `
+        
         resultContainer.appendChild(resultText)
         const tryAgainBtn = document.createElement("button")
         resultContainer.appendChild(tryAgainBtn)
 
         tryAgainBtn.innerText = "try again"
         document.body.appendChild(resultContainer);
+
+
+
 
         document.querySelector(".result button").addEventListener("click", reset_quiz)
         function reset_quiz() {
