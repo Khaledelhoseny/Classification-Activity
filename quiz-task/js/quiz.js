@@ -81,8 +81,16 @@ const jsonFile = ` {
 } `
 
 ///------------ Globals------------------------
-
-const projectObject = JSON.parse(jsonFile)
+let projectObject;
+if(localStorage.getItem("projectObject"))
+{
+     projectObject = JSON.parse(localStorage.getItem("projectObject"))
+}
+else
+{
+    projectObject = JSON.parse(jsonFile)
+}
+ 
 const wordText = document.querySelector("#word")
 const choicesButtons = document.querySelectorAll("button")
 const progressBar = document.querySelector(".progress")
@@ -98,26 +106,43 @@ const wordsNumber = 15
 
 
 
-function getRandom(arr) {
+function getRandomIndex(arr) {
     index = Math.floor(Math.random() * arr.length)
+      
+    word_id = arr[index].id
+    window.localStorage.setItem("word_id",word_id)
+
     return arr[index]
+    
 }
 
 
 function changeRandom() {
-    const randomObject = getRandom(projectObject.wordList)
-    wordText.innerText = randomObject.word
+   const filteredWords = projectObject.wordList.filter(wordObj => !wordObj.submitted)
+   console.log("Filtered", filteredWords)
+   console.log("Original", projectObject.wordList)
+    const randomObject = getRandomIndex(filteredWords)
+
+    // wordText.innerText = randomObject.word
+    window.localStorage.setItem("randomObject.word",randomObject.word)
+    wordText.innerText = window.localStorage.getItem("randomObject.word")
+    
 }
 
-changeRandom()
+wordText.innerText = window.localStorage.getItem("randomObject.word")
+
+// changeRandom()
+
 
 function incrementProgressBar() {
         const progressBarWidth = progressBar.offsetWidth + 23
-        progressBar.style.width = `${progressBarWidth}px`
-        
+        window.localStorage.setItem("progressBarWidth",progressBarWidth)
+        progressBar.style.width = `${window.localStorage.getItem("progressBarWidth")}px`
+
 }
 
 
+progressBar.style.width = `${window.localStorage.getItem("progressBarWidth")}px`
 
 
 function applyBackgroundGreen(button) {
@@ -139,7 +164,7 @@ function applyBackgroundGreen(button) {
 
 
 function applyBackgroundRed(button) {
-    const rightAns = document.querySelector(`#${projectObject.wordList[index].pos}`)
+    const rightAns = document.querySelector(`#${projectObject.wordList[window.localStorage.getItem("word_id")].pos}`)
     rightAns.classList.add("succes")
     setTimeout(function () {
         rightAns.classList.remove("succes")
@@ -167,18 +192,23 @@ choicesButtons.forEach(function (choiceButton) {
     choiceButton.addEventListener("click", checkAnswer)
 
     function checkAnswer() {
-        if (choiceButton.innerText === projectObject.wordList[index].pos) {
+        
+        if (choiceButton.innerText === projectObject.wordList[window.localStorage.getItem("word_id")].pos) {
             applyBackgroundGreen(choiceButton)
-            projectObject.wordList[index].score = true
+            projectObject.wordList[window.localStorage.getItem("word_id")].score = true
             // filterScores()
             incrementSoreBar()
-        } else if (choiceButton.innerText !== projectObject.wordList[index].pos) {
+            localStorage.setItem("projectObject", JSON.stringify(projectObject))
+            
+
+        } else if (choiceButton.innerText !== projectObject.wordList[window.localStorage.getItem("word_id")].pos) {
             applyBackgroundRed(choiceButton)
         }
+        projectObject.wordList[window.localStorage.getItem("word_id")].submitted = true
 
+        setTimeout(showResult, 1000)
         setTimeout(changeRandom, 1000)
         incrementProgressBar()
-        setTimeout(showResult, 1000)
       
 
     }
@@ -187,20 +217,18 @@ choicesButtons.forEach(function (choiceButton) {
 })
 
 
-
-
-      
-  
-let scoresArr =[]
+ let scoresArr=[]
 function incrementSoreBar(){
         scoresArr = projectObject.wordList.filter(obj => {
         return obj.score === true;
       })
-      
-
-    scoreBar.innerText = `${scoresArr.length} of ${wordsNumber}`
+    window.localStorage.setItem("scoresArr.length",scoresArr.length)
+    scoreBar.innerText = `${window.localStorage.getItem("scoresArr.length")} of ${wordsNumber}`
     console.log(scoresArr)
 }
+
+scoreBar.innerText = `${window.localStorage.getItem("scoresArr.length")} of ${wordsNumber}`
+
 
 
 
@@ -230,7 +258,20 @@ function showResult() {
             console.log("try again button ")
             resultContainer.remove()
             document.querySelector("#big_container").style.display = "block"
+            localStorage.clear()
+            changeRandom()
             progressBar.style.width = `0px`
+            scoreBar.innerText = `0 of 15`
+            for(let i=0 ;i<=projectObject.wordList.length;i++){
+                if(projectObject.wordList[i].score===true){
+                    delete projectObject.wordList[i].score
+                }
+
+             }
+             
+
+             
+
             
         }
 
